@@ -1,39 +1,39 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+  // 初期値としてローカルストレージからデータを取得
+  const [tasks, setTasks] = useState(() => {
+    const temp = localStorage.getItem("keepTodo");
+    try {
+      const loaded = JSON.parse(temp);
+      return Array.isArray(loaded) ? loaded : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [task, setTask] = useState('');
 
+  // tasksが変更されたらローカルストレージに保存
   useEffect(() => {
-    const temp = JSON.stringify(tasks);
-    localStorage.setItem("keepTodo", temp);
+    localStorage.setItem("keepTodo", JSON.stringify(tasks));
   }, [tasks]);
 
-  useEffect(() => {
-    const temp = localStorage.getItem("keepTodo");
-    const loadedTodo = JSON.parse(temp);
-    if (loadedTodo) {
-      setTasks(loadedTodo);
-    }
-  }, []);
-
+  // 新しいタスクを追加
   const addTask = () => {
     if (task.trim()) {
-      setTasks([...tasks, { text: task, completed: false }]);
+      setTasks([...tasks, { id: Date.now(), text: task, isCompleted: false }]);
       setTask('');
     }
   };
 
+  // タスクの完了状態を切り替え
   const toggleTaskCompletion = (id) => {
     setTasks(
       tasks.map((task) =>
         task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
       )
     );
-  };
-
-  const deleteTask = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
   };
 
   return (
@@ -49,18 +49,14 @@ function App() {
       <button onClick={addTask}>追加</button>
       
       <ul>
-        {tasks.map((task, index) => (
-          <li key={index} style={{ textDecoration: task.isCompleted ? 'line-through' : 'none' }}>
+        {tasks.map((task) => (
+          <li key={task.id} style={{ textDecoration: task.isCompleted ? 'line-through' : 'none' }}>
             <input
               type="checkbox"
               checked={task.isCompleted}
               onChange={() => toggleTaskCompletion(task.id)}
-              className="task-checkbox"
             />
-
             {task.text}
-            
-            <button onClick={() => deleteTask(index)}>削除</button>
           </li>
         ))}
       </ul>
