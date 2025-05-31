@@ -13,6 +13,8 @@ function App() {
   });
 
   const [task, setTask] = useState('');
+  const [sortOrder, setSortOrder] = useState('incompleteFirst');
+  const [isSortEnabled, setIsSortEnabled] = useState(true);
 
   // tasksが変更されたらローカルストレージに保存
   useEffect(() => {
@@ -41,6 +43,27 @@ function App() {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
+  // 並べ順の変更
+  const toggleSortOrder = () => {
+    setSortOrder(prev => 
+      prev === 'incompleteFirst' ? 'completeFirst' : 'incompleteFirst'
+    );
+  };
+
+  const toggleSortEnabled = () => {
+    setIsSortEnabled(prev => !prev);
+  };
+
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (sortOrder === 'incompleteFirst') {
+      return a.isCompleted - b.isCompleted;
+    } else {
+      return b.isCompleted - a.isCompleted;
+    }
+  });
+
+  const displayTasks = isSortEnabled ? sortedTasks : tasks;
+
   return (
     <div>
       <h1>ToDoリスト</h1>
@@ -52,9 +75,17 @@ function App() {
         placeholder="New task"
       />
       <button onClick={addTask}>追加</button>
+
+      <br /><br />
+      <button onClick={toggleSortOrder}>
+        並び順: {sortOrder === 'incompleteFirst' ? '未完了が上' : '完了が上'}
+      </button>
+      <button onClick={toggleSortEnabled}>
+        並び替え: {isSortEnabled ? '有効' : '無効'}
+      </button>
       
       <ul>
-        {tasks.map((task) => (
+        {displayTasks.map((task) => (
           <li key={task.id} style={{ textDecoration: task.isCompleted ? 'line-through' : 'none' }}>
             <input
               type="checkbox"
