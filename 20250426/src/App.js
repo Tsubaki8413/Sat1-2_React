@@ -36,6 +36,11 @@ function App() {
     );
   };
 
+  // タスクを削除
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
   return (
     <div>
       <h1>ToDoリスト</h1>
@@ -57,6 +62,7 @@ function App() {
               onChange={() => toggleTaskCompletion(task.id)}
             />
             {task.text}
+            <button onClick={() => deleteTask(task.id)}>削除</button>
           </li>
         ))}
       </ul>
