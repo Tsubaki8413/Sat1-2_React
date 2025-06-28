@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 function App() {
     const [inputText, setInputText] = useState("");
-    const [log, setLog] = useState("");
 
     return(
         <div>
